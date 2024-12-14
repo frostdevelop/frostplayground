@@ -717,11 +717,32 @@
     function vcnsclr(){consolee.value = "";consolee.placeholder = "Console cleared"}
     playframe.contentWindow.console = {log: vcnslog,error: function (m){vcnslog("Error:" + m)},warn: function (m){vcnslog("Warn:" + m)},info: function (m){vcnslog("Info:" + m)},debug: function (m){vcnslog("Debug:" + m)},clear: vcnsclr,dir: vcnsdir};
     //mar: class def
+	class storageEmulator {
+		constructor(){
+			this.db = new Map();
+		}
+		getItem(id){
+			return this.db.get(id) || null;
+		}
+		setItem(id,data){
+			this.db.set(id,data);
+		}
+		removeItem(id){
+			this.db.remove(id);
+		}
+	}
     class fileSys {
       constructor (container,filesid,filekeyid){
         this.container = container;
-        this.files = JSON.parse(localStorage.getItem(filesid)) || [];
-        this.filekey = JSON.parse(localStorage.getItem(filekeyid)) || [];
+		try{
+			this.storage = localStorage;
+		}catch(e){
+			console.warn("localStorage unavailable, loading polyfill\nError: " + e.stack);
+			alert("WARNING! Native storage api unavailable, files will be flushed on exit.");
+			this.storage = new storageEmulator();
+		}
+        this.files = JSON.parse(this.storage.getItem(filesid)) || [];
+        this.filekey = JSON.parse(this.storage.getItem(filekeyid)) || [];
         this.filesid = filesid;
         this.filekeyid = filekeyid;
         this.sectors = new Array(this.filekey.length);
@@ -763,8 +784,8 @@
                 this.files.splice(indexofsect,1);
                 this.sectors[i].remove();
               };
-              localStorage.setItem(this.filesid,JSON.stringify(this.files))
-              localStorage.setItem(this.filekeyid,JSON.stringify(this.filekey))
+              this.storage.setItem(this.filesid,JSON.stringify(this.files))
+              this.storage.setItem(this.filekeyid,JSON.stringify(this.filekey))
             }
           })
           date.appendChild(ndel);
@@ -785,8 +806,8 @@
       }
       update(){
         //todo figure out wht not updating after localStorage?
-        this.files = JSON.parse(localStorage.getItem(this.filesid)) || [];
-        this.filekey = JSON.parse(localStorage.getItem(this.filekeyid)) || [];
+        this.files = JSON.parse(this.storage.getItem(this.filesid)) || [];
+        this.filekey = JSON.parse(this.storage.getItem(this.filekeyid)) || [];
         this.container.innerHTML = "";
         if(!(this.filekey === null)){
           for(let i=0;i<this.filekey.length;i++){
@@ -840,7 +861,7 @@
         head.value = head.value || "Untitled";
         if(this.filekey.indexOf(head.value) === -1){
           this.filekey[this.filekey.indexOf(keyfor)] = head.value;
-          localStorage.setItem(this.filekeyid,JSON.stringify(this.filekey));
+          this.storage.setItem(this.filekeyid,JSON.stringify(this.filekey));
         } else if(!(head.value === keyfor)){
           let yn = prompt("Are you sure you want to merge? (y/n)").toLowerCase();
           if(yn === "y"){
@@ -869,8 +890,8 @@
             let nstyseccont = nstysec.getElementsByClassName("dateCont")[0];
             nstyseccont.innerHTML = "";
             this.renderPosts(nind,nstyseccont,nkey);
-            localStorage.setItem(this.filesid,JSON.stringify(this.files));
-            localStorage.setItem(this.filekeyid,JSON.stringify(this.filekey));
+            this.storage.setItem(this.filesid,JSON.stringify(this.files));
+            this.storage.setItem(this.filekeyid,JSON.stringify(this.filekey));
           }
         }
         return head.value;
@@ -898,8 +919,8 @@
         } else {
           this.files[keyindex].push([Date.now(),htmli.value,cssi.value,jsin.value]);
         }
-        localStorage.setItem(this.filesid,JSON.stringify(this.files));
-        localStorage.setItem(this.filekeyid,JSON.stringify(this.filekey));
+        this.storage.setItem(this.filesid,JSON.stringify(this.files));
+        this.storage.setItem(this.filekeyid,JSON.stringify(this.filekey));
       };
     };
     class menuSys {
@@ -1624,7 +1645,7 @@
     }
     });
     filebtn[2].addEventListener("click",e=>{
-      dwnl(JSON.stringify([JSON.parse(localStorage.getItem("saveskey")),JSON.parse(localStorage.getItem("saves"))]),"FrostPlaygroundDB.fdb");
+      dwnl(JSON.stringify([JSON.parse(savedb.storage.getItem("saveskey")),JSON.parse(savedb.storage.getItem("saves"))]),"FrostPlaygroundDB.fdb");
     });
     filebtn[3].addEventListener("click",e=>{
       let yn = prompt("Are you sure you want to Import? (This is irreversable) (y/n)");
@@ -1637,8 +1658,8 @@
           fr.onload = ()=>{
             try{
             let jsondata = JSON.parse(fr.result);
-            localStorage.setItem("saveskey",JSON.stringify(jsondata[0]));
-            localStorage.setItem("saves",JSON.stringify(jsondata[1]));
+            savedb.storage.setItem("saveskey",JSON.stringify(jsondata[0]));
+            savedb.storage.setItem("saves",JSON.stringify(jsondata[1]));
             }catch(e){alert("File Error: " + e)}
           }
           fr.readAsText(uploader.files[0]);
