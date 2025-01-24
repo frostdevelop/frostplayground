@@ -18,10 +18,12 @@
       --layer2: #222;
       --layer3: #444;
       --layer4: #555;
+      --layer5: #777;
       --top0: white;
       --top1: #eee;
       --top2: #888;
       --sel: #52d1ff;
+      --act: #999;
       /* --sel: #8df094 even if green = style, blue still ux favor */
     }
     body.light {
@@ -33,18 +35,33 @@
       --layer2: #aaa;
       --layer3: #bbb;
       --layer4: #eee;
+      --layer5: #f1f1f1;
       --top0: black;
       --top1: #111;
-      --top2: #333;
+      --top2: #777;
       --sel: #3a3f99;
+      --act: #ddd;
       /* --sel: #04b310; */
     }
+    ::-webkit-scrollbar {width: 10px;}
+    ::-webkit-scrollbar-track {
+      background: var(--layer2); /* calc(var(--layer)+#1111) */
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--layer4);
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {background:var(--layer5);}
+    ::-webkit-scrollbar-thumb:active {box-shadow: 0 0 10px var(--top0);}
     input, button, textarea, iframe {
       border: rgba(0,0,0,0.2) solid 1px;
       border-radius: 2px
       box-shadow: 0px 0px 2px rgba(0,0,0,0.5);
       padding: 5px;
     }
+    button {background:var(--layer5);}
+    button:hover,input[type="reset"]:hover {background:var(--layer4);}
+    button:active,input[type="reset"]:active {background:var(--act);}
     hr {
       border-color: currentcolor;
     }
@@ -314,6 +331,7 @@
     }
     .pagemodal .contentmodal .item {
       transition: background .1s linear;
+      padding: 5px;
     }
     dialog .headermodal h2 {
       font-weight: normal;
@@ -515,19 +533,23 @@
         <h2>Preferences</h2>
       </div>
       <hr/>
-      <div class='contentmodal'>
-      <div class='item'>
+      <form class='contentmodal'>
+      <label class='item'>
         Name: <input type="text" class="smol iinput" placeholder="Untitled" id="fne"></input>
-      </div>
-      <div class='item'>
+      </label>
+      <label class='item'>
       Indent:
       <select id="sel0" class="iinput">
-        <option value="  ">2space</option>
         <option value=" ">1space</option>
-        <option value="&Tab;">1tab</option>
+        <option value="  ">2space</option>
+        <option value="    ">4space</option>
+        <option value="        ">8space</option>
+        <option value="&Tab;" selected>1tab</option>
+        <option value="&Tab;&Tab;">2tab</option>
+        <option value="&Tab;&Tab;&Tab;&Tab;">4tab</option>
       </select>
-      </div>
-      <div class='item'>
+      </label>
+      <label class='item'>
       Wrap:
       <select id="sel1" class="iinput">
         <option value="nw">None</option>
@@ -535,49 +557,53 @@
         <option value="ww">Word</option>
         <option value="ab">Break All</option>
       </select>
-      </div>
-      <div class='item'>
-      <input type="checkbox" class="iinput" checked id="chk0">Autoindent</input>
-      </div>
-      <div class='item'>
+      </label>
+      <label class='item'>
+        <input type="checkbox" class="iinput" checked id="chk0">Autoindent</input>
+      </label>
+      <label class='item'>
         <input type="checkbox" class="iinput" checked id="chk1">Auto-Close Parentheses</input>
-      </div>
-      <div class='item'>
+      </label>
+      <label class='item'>
         <input type="checkbox" class="iinput" checked id="chk2">Auto-Close Quotes</input>
-      </div>
-      <div class='item'>
+      </label>
+      <label class='item'>
         <input type="checkbox" class="iinput" checked id="chk3">Auto-Update</input>
-      </div>
-      <div class='item'>
+      </label>
+      <label class='item'>
         <input type="checkbox" class="iinput" checked id="chk4">Undo History</input>
-      </div>
+      </label>
       <div class='item'>
         <button class="iinput">Delete History</input>
       </div>
-      <div class='item'>
+      <label class='item'>
        Tab size: <input type="number" class="smol iinput" value="4" id="tse"></input>
-      </div>
-      <div class='item'>
+      </label>
+      <label class='item'>
         <input type="checkbox" class="iinput" checked id="chk5">Update Lines</input>
-      </div>
-      <div class='item'>
+      </label>
+      <label class='item'>
         <input type="checkbox" class="iinput" checked id="chk6">Console Divider</input>
-      </div>
-      <div class='item'>
+      </label>
+      <label class='item'>
         <input type="checkbox" class="iinput" id="chk7">Bundle Cursor and Hotkeys</input>
         <!-- Consumer default = uncheck -->
-      </div>
-      <div class='item'>
+      </label>
+      <label class='item'>
         <input type="checkbox" class="iinput" id="chk8" checked>Auto-cancel closing closed paren</input>
-      </div>
-      <div class='item'>
+      </label>
+      <label class='item'>
         <input type="checkbox" class="iinput" id="chk9">Auto-cancel closing closed quote</input>
-      </div>
-      <div class='item'>
+      </label>
+      <label class='item'>
         <input type="checkbox" class="iinput" id="chk10" checked>Enable console output</input>
+      </label>
+      <div class="item">
+        <input type="reset" value="Reset Settings"></input>
       </div>
-      </div>
-      <footer>Copyright 2024 Pacifiky. All rights reserved.<br/>Thank you Aaron for testing!</footer>
+      </form>
+      <br/>
+      <footer>© 2025 Pacifiky. ||| CC BY-NC-SA 4.0<br/>Thank you Aaron for testing!</footer>
     </dialog>
   </div>
   <div id="topbtn"><button id="trig5e">HTML</button><button id="trig6e">CSS</button><button id="trig7e">JS</button><button id="trig18e">Prev</button><button id="trig9e" value="true">Console</button><button id="trig8e" value="true">Theme</button><button id="trig1e">Fullscreen</button></div>
